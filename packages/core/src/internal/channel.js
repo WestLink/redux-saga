@@ -42,8 +42,10 @@ export function channel(buffer = buffers.expanding()) {
       return
     }
     if (takers.length === 0) {
+      // 没有消费者就先放到队列中
       return buffer.put(input)
     }
+    // 让消费者队列中的首个来消费
     const cb = takers.shift()
     cb(input)
   }
@@ -55,11 +57,12 @@ export function channel(buffer = buffers.expanding()) {
     }
 
     if (closed && buffer.isEmpty()) {
+      // 通道已关，并且队列中也没有待处理的，告知消费者已经结束
       cb(END)
     } else if (!buffer.isEmpty()) {
-      cb(buffer.take())
+      cb(buffer.take()) // 消费
     } else {
-      takers.push(cb)
+      takers.push(cb) // 没有可消费的，进入等待队列
       cb.cancel = () => {
         remove(takers, cb)
       }
@@ -76,6 +79,7 @@ export function channel(buffer = buffers.expanding()) {
       cb(END)
       return
     }
+    // 消费所有的生产资料
     cb(buffer.flush())
   }
 

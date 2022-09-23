@@ -18,6 +18,7 @@ export function runSaga(
     check(saga, is.func, NON_GENERATOR_ERR)
   }
 
+  // 返回的是generator的迭代器
   const iterator = saga(...args)
 
   if (process.env.NODE_ENV !== 'production') {
@@ -71,7 +72,7 @@ export function runSaga(
 
   const env = {
     channel,
-    dispatch: wrapSagaDispatch(dispatch),
+    dispatch: wrapSagaDispatch(dispatch), // 为每个action打上特殊的标记
     getState,
     sagaMonitor,
     onError,

@@ -10,6 +10,7 @@ export default function sagaMiddlewareFactory({ context = {}, channel = stdChann
     check(channel, is.channel, 'options.channel passed to the Saga middleware is not a channel')
   }
 
+  // 这个中间件的处理就是把所有的action都放到待处理队列中
   function sagaMiddleware({ getState, dispatch }) {
     boundRunSaga = runSaga.bind(null, {
       ...options,
@@ -30,6 +31,7 @@ export default function sagaMiddlewareFactory({ context = {}, channel = stdChann
     }
   }
 
+  // 提供一个给外界直接执行的能力
   sagaMiddleware.run = (...args) => {
     if (process.env.NODE_ENV !== 'production' && !boundRunSaga) {
       throw new Error('Before running a Saga, you must mount the Saga middleware on the Store using applyMiddleware')
